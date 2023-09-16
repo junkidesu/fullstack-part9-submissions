@@ -1,5 +1,5 @@
 import diagnoseData from '../../data/diagnoses';
-import { Diagnose } from '../../types';
+import { Diagnose } from '../types';
 
 const getDiagnoses = (): Diagnose[] => {
     return diagnoseData;

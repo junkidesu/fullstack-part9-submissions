@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getAllEntries, createEntry } from "./diaryService";
 import { NonSensitiveDiaryEntry, DiaryItemProps, NewDiaryEntry } from "./types";
+import { isAxiosError } from "axios";
 
 const DiaryItem = (props: DiaryItemProps) => {
   return (
@@ -14,8 +15,24 @@ const DiaryItem = (props: DiaryItemProps) => {
   );
 };
 
+interface ErrorMessageProps {
+  message: string | undefined;
+}
+const ErrorMessage = (props: ErrorMessageProps) => {
+  const style: React.CSSProperties = {
+    color: "red",
+  };
+
+  if (!props.message) {
+    return null;
+  }
+
+  return <p style={style}>{props.message}</p>;
+};
+
 const App = () => {
   const [entries, setEntries] = useState<NonSensitiveDiaryEntry[]>([]);
+  const [message, setMessage] = useState<string | undefined>(undefined);
   const [date, setDate] = useState("");
   const [visibility, setVisibility] = useState("");
   const [weather, setWeather] = useState("");
@@ -35,21 +52,32 @@ const App = () => {
       weather,
     } as NewDiaryEntry;
 
-    createEntry(newEntry).then((addedEntry) => {
-      setEntries(
-        entries.concat({
-          id: addedEntry.id,
-          date: addedEntry.date,
-          visibility: addedEntry.visibility,
-          weather: addedEntry.weather,
-        })
-      );
-    });
+    createEntry(newEntry)
+      .then((addedEntry) => {
+        setEntries(
+          entries.concat({
+            id: addedEntry.id,
+            date: addedEntry.date,
+            visibility: addedEntry.visibility,
+            weather: addedEntry.weather,
+          })
+        );
+      })
+      .catch((error) => {
+        if (isAxiosError(error)) {
+          setMessage(error.response?.data as string);
+          setTimeout(() => {
+            setMessage(undefined);
+          }, 2000);
+        }
+      });
   };
 
   return (
     <div>
       <h3>Add new entry</h3>
+
+      <ErrorMessage message={message} />
 
       <form onSubmit={addEntry}>
         <div>

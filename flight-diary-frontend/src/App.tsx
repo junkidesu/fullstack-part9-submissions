@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { getAllEntries, createEntry } from "./diaryService";
-import { NonSensitiveDiaryEntry, DiaryItemProps, NewDiaryEntry } from "./types";
+import {
+  NonSensitiveDiaryEntry,
+  DiaryItemProps,
+  NewDiaryEntry,
+  Visibility,
+  Weather,
+} from "./types";
 import { isAxiosError } from "axios";
 
 const DiaryItem = (props: DiaryItemProps) => {
@@ -62,6 +68,11 @@ const App = () => {
             weather: addedEntry.weather,
           })
         );
+
+        setDate("");
+        setVisibility("");
+        setWeather("");
+        setComment("");
       })
       .catch((error) => {
         if (isAxiosError(error)) {
@@ -83,24 +94,47 @@ const App = () => {
         <div>
           date{" "}
           <input
+            type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)}
+            required
           />
         </div>
+
         <div>
           visibility{" "}
-          <input
-            value={visibility}
-            onChange={(event) => setVisibility(event.target.value)}
-          />
+          {Object.values(Visibility).map((v) => (
+            <span key={v}>
+              <input
+                type="radio"
+                id={v}
+                name="visibility"
+                checked={visibility === v}
+                onChange={() => setVisibility(v)}
+                required
+              />
+              <label htmlFor={v}>{v}</label>
+            </span>
+          ))}
         </div>
+
         <div>
           weather{" "}
-          <input
-            value={weather}
-            onChange={(event) => setWeather(event.target.value)}
-          />
+          {Object.values(Weather).map((w) => (
+            <span key={w}>
+              <input
+                type="radio"
+                id={w}
+                name="weather"
+                checked={weather === w}
+                onChange={() => setWeather(w)}
+                required
+              />
+              <label htmlFor={w}>{w}</label>
+            </span>
+          ))}
         </div>
+
         <div>
           comment{" "}
           <input
@@ -108,6 +142,7 @@ const App = () => {
             onChange={(event) => setComment(event.target.value)}
           />
         </div>
+
         <button>add</button>
       </form>
 

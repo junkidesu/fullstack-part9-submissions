@@ -7,13 +7,16 @@ const getPatients = (): Patient[] => {
 };
 
 const getNonSensitivePatients = (): NonSensitivePatient[] => {
-  return patientData.map(({ id, name, dateOfBirth, gender, occupation }) => ({
-    id,
-    name,
-    dateOfBirth,
-    gender,
-    occupation,
-  }));
+  return patientData.map(
+    ({ id, name, dateOfBirth, gender, occupation, entries }) => ({
+      id,
+      name,
+      dateOfBirth,
+      gender,
+      occupation,
+      entries,
+    })
+  );
 };
 
 const addPatient = (patient: NewPatient): Patient => {

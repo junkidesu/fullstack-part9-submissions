@@ -1,29 +1,33 @@
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
-import { Patient, Gender, Entry } from "../../types";
+import { Patient, Gender, Entry, Diagnosis } from "../../types";
 
 interface PatientInfoProps {
   patient: Patient;
+  diagnoses: Diagnosis[];
 }
 
 interface EntryItemProps {
   entry: Entry;
+  diagnoses: Diagnosis[];
 }
 
-const EntryItem = ({ entry }: EntryItemProps) => {
+const EntryItem = ({ entry, diagnoses }: EntryItemProps) => {
   return (
     <div>
       {entry.date} <i>{entry.description}</i>
       <ul>
         {entry.diagnosisCodes?.map((c) => (
-          <li key={c}>{c}</li>
+          <li key={c}>
+            {c} {diagnoses.find((d) => d.code === c)?.name}
+          </li>
         ))}
       </ul>
     </div>
   );
 };
 
-const PatientInfo = ({ patient }: PatientInfoProps) => {
+const PatientInfo = ({ patient, diagnoses }: PatientInfoProps) => {
   return (
     <div>
       <h2>
@@ -38,7 +42,7 @@ const PatientInfo = ({ patient }: PatientInfoProps) => {
 
       <div>
         {patient.entries.map((e) => (
-          <EntryItem key={e.id} entry={e} />
+          <EntryItem key={e.id} entry={e} diagnoses={diagnoses} />
         ))}
       </div>
     </div>

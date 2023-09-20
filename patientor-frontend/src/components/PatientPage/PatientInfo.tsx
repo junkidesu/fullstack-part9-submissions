@@ -5,12 +5,7 @@ import {
 import {
   Patient,
   Gender,
-  Entry,
   Diagnosis,
-  HealthCheckEntry,
-  HealthCheckRating,
-  OccupationalHealthcareEntry,
-  HospitalEntry,
 } from "../../types";
 import EntryDetails from "./EntryDetails";
 

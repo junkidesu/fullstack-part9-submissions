@@ -15,7 +15,7 @@ const entryStyle: React.CSSProperties = {
   borderRadius: "10px",
 };
 
-const colors = ["green", "yellow", "orange", "red"];
+const healthCheckColors = ["green", "yellow", "orange", "red"];
 
 const HealthCheckEntryDetails = ({ entry, diagnoses }: HealthCheckProps) => {
   return (
@@ -25,7 +25,9 @@ const HealthCheckEntryDetails = ({ entry, diagnoses }: HealthCheckProps) => {
       </div>
 
       <div>
-        <Favorite style={{ color: colors[entry.healthCheckRating] }} />
+        <Favorite
+          style={{ color: healthCheckColors[entry.healthCheckRating] }}
+        />
       </div>
 
       <div>

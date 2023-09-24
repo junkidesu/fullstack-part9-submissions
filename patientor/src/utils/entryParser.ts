@@ -5,6 +5,7 @@ import {
   BaseEntry,
   HealthCheckRating,
   Discharge,
+  SickLeave,
 } from "../types";
 
 const isString = (text: unknown): text is string => {
@@ -60,12 +61,7 @@ const parseDiagnosisCodes = (object: unknown): Array<Diagnose["code"]> => {
 };
 
 const toNewBaseEntry = (object: object): Omit<BaseEntry, "id"> => {
-  if (
-    "description" in object &&
-    "date" in object &&
-    "specialist" in object &&
-    "diagnosisCodes" in object
-  ) {
+  if ("description" in object && "date" in object && "specialist" in object) {
     return {
       description: parseDescription(object.description),
       date: parseDate(object.date),
@@ -103,8 +99,50 @@ const toNewHealthCheckEntry = (object: object): NewEntry => {
   }
 };
 
-const toNewOccupationalHealthcareEntry = (_object: object): NewEntry => {
-  throw new Error("TODO");
+const parseEmployerName = (name: unknown): string => {
+  if (!isString(name)) {
+    throw new Error("Invalid employer name" + name);
+  }
+
+  return name;
+};
+
+const isSickLeave = (sickLeave: object): sickLeave is SickLeave => {
+  return (
+    "startDate" in sickLeave &&
+    "endDate" in sickLeave &&
+    isString(sickLeave.startDate) &&
+    isDate(sickLeave.startDate) &&
+    isString(sickLeave.endDate) &&
+    isDate(sickLeave.endDate)
+  );
+};
+
+const parseSickLeave = (object: object): SickLeave | undefined => {
+  if (!("sickLeave" in object) || !object.sickLeave) {
+    return undefined;
+  }
+
+  if (typeof object.sickLeave !== "object" || !isSickLeave(object.sickLeave)) {
+    throw new Error("Invalid sick leave");
+  }
+
+  return object.sickLeave;
+};
+
+const toNewOccupationalHealthcareEntry = (object: object): NewEntry => {
+  const baseEntry = toNewBaseEntry(object);
+
+  if ("employerName" in object) {
+    return {
+      ...baseEntry,
+      type: "OccupationalHealthcare",
+      sickLeave: parseSickLeave(object),
+      employerName: parseEmployerName(object.employerName),
+    };
+  } else {
+    throw new Error("Some data missing or invalid");
+  }
 };
 
 const isDischarge = (discharge: object): discharge is Discharge => {

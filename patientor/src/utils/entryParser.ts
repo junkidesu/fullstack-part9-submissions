@@ -4,6 +4,7 @@ import {
   Diagnose,
   BaseEntry,
   HealthCheckRating,
+  Discharge,
 } from "../types";
 
 const isString = (text: unknown): text is string => {
@@ -11,7 +12,7 @@ const isString = (text: unknown): text is string => {
 };
 
 const isDate = (date: string): boolean => {
-    return Boolean(Date.parse(date));
+  return Boolean(Date.parse(date));
 };
 
 const parseType = (type: unknown) => {
@@ -34,11 +35,11 @@ const parseDescription = (description: unknown): string => {
 };
 
 const parseDate = (date: unknown): string => {
-    if (!isString(date) || !isDate(date)) {
-        throw new Error("invalid date: " + date);
-      }
-    
-      return date;
+  if (!isString(date) || !isDate(date)) {
+    throw new Error("invalid date: " + date);
+  }
+
+  return date;
 };
 
 const parseSpecialist = (specialist: unknown): string => {
@@ -69,7 +70,7 @@ const toNewBaseEntry = (object: object): Omit<BaseEntry, "id"> => {
       description: parseDescription(object.description),
       date: parseDate(object.date),
       specialist: parseSpecialist(object.specialist),
-      diagnosisCodes: parseDiagnosisCodes(object.diagnosisCodes),
+      diagnosisCodes: parseDiagnosisCodes(object),
     };
   } else {
     throw new Error("Some fields are missing or invalid");
@@ -102,12 +103,40 @@ const toNewHealthCheckEntry = (object: object): NewEntry => {
   }
 };
 
-const toNewOccupationalHealthcareEntry = (_object: unknown): NewEntry => {
-  throw new Error();
+const toNewOccupationalHealthcareEntry = (_object: object): NewEntry => {
+  throw new Error("TODO");
 };
 
-const toNewHospitalEntry = (_object: unknown): NewEntry => {
-  throw new Error("To be implemented");
+const isDischarge = (discharge: object): discharge is Discharge => {
+  return (
+    "date" in discharge &&
+    "criteria" in discharge &&
+    isString(discharge.criteria) &&
+    isString(discharge.date) &&
+    isDate(discharge.date)
+  );
+};
+
+const parseDischarge = (discharge: unknown) => {
+  if (!discharge || typeof discharge !== "object" || !isDischarge(discharge)) {
+    throw new Error("Invalid discharge");
+  }
+
+  return discharge;
+};
+
+const toNewHospitalEntry = (object: object): NewEntry => {
+  const baseEntry = toNewBaseEntry(object);
+
+  if ("discharge" in object) {
+    return {
+      ...baseEntry,
+      type: "Hospital",
+      discharge: parseDischarge(object.discharge),
+    };
+  } else {
+    throw new Error("Some data missing or invalid");
+  }
 };
 
 export const toNewEntry = (object: unknown): NewEntry => {

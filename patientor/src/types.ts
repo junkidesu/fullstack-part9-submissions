@@ -39,19 +39,23 @@ export interface OccupationalHealthcareEntry extends BaseEntry {
   };
 }
 
+export interface Discharge {
+  date: string;
+  criteria: string;
+}
+
 export interface Hospital extends BaseEntry {
-  type: 'Hospital';
-  discharge: {
-    date: string;
-    criteria: string;
-  }
+  type: "Hospital";
+  discharge: Discharge;
 }
 
 export type Entry = HealthCheckEntry | OccupationalHealthcareEntry | Hospital;
 
-type UnionOmit<T, K extends string | number | symbol> = T extends unknown ? Omit<T, K> : never;
+type UnionOmit<T, K extends string | number | symbol> = T extends unknown
+  ? Omit<T, K>
+  : never;
 
-export type NewEntry = UnionOmit<Entry, 'id'>;
+export type NewEntry = UnionOmit<Entry, "id">;
 
 export interface Patient {
   id: string;

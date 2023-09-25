@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Male, Female } from "@mui/icons-material";
+import { Alert } from "@mui/material";
 import {
   EntryFormValues,
   Entry,
@@ -9,6 +11,7 @@ import {
 import EntryDetails from "./EntryDetails";
 import NewEntryForm from "./NewEntryForm";
 import patientService from "../../services/patients";
+import { AxiosError } from "axios";
 
 interface Props {
   patient: Patient;
@@ -25,22 +28,41 @@ const PatientInfo = ({
   setPatient,
   setPatients,
 }: Props) => {
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  );
   const submitEntry = async (newEntry: EntryFormValues) => {
-    const addedEntry: Entry = await patientService.addEntry(
-      patient.id,
-      newEntry
-    );
+    try {
+      const addedEntry: Entry = await patientService.addEntry(
+        patient.id,
+        newEntry
+      );
 
-    const updatedPatient: Patient = {
-      ...patient,
-      entries: patient.entries.concat(addedEntry),
-    };
+      const updatedPatient: Patient = {
+        ...patient,
+        entries: patient.entries.concat(addedEntry),
+      };
 
-    setPatient(updatedPatient);
+      setPatient(updatedPatient);
 
-    setPatients(
-      patients.map((p) => (p.id === updatedPatient.id ? updatedPatient : p))
-    );
+      setPatients(
+        patients.map((p) => (p.id === updatedPatient.id ? updatedPatient : p))
+      );
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if ("response" in error && error.response) {
+          if (
+            typeof error.response.data === "object" &&
+            "error" in error.response.data
+          ) {
+            setErrorMessage(error.response.data.error);
+            setTimeout(() => {
+              setErrorMessage(undefined);
+            }, 2000);
+          }
+        }
+      }
+    }
   };
 
   return (
@@ -54,6 +76,8 @@ const PatientInfo = ({
         ssn: {patient.ssn} <br />
         occupation: {patient.occupation}
       </p>
+
+      {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
 
       <NewEntryForm onSubmit={submitEntry} />
 

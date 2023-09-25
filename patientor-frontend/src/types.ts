@@ -7,7 +7,7 @@ export interface Diagnosis {
 export enum Gender {
   Male = "male",
   Female = "female",
-  Other = "other"
+  Other = "other",
 }
 
 interface BaseEntry {
@@ -40,14 +40,23 @@ export interface OccupationalHealthcareEntry extends BaseEntry {
 }
 
 export interface HospitalEntry extends BaseEntry {
-  type: 'Hospital';
+  type: "Hospital";
   discharge: {
     date: string;
     criteria: string;
-  }
+  };
 }
 
-export type Entry = HealthCheckEntry | OccupationalHealthcareEntry | HospitalEntry;
+export type Entry =
+  | HealthCheckEntry
+  | OccupationalHealthcareEntry
+  | HospitalEntry;
+
+type UnionOmit<T, K extends string | number | symbol> = T extends unknown
+  ? Omit<T, K>
+  : never;
+
+export type EntryFormValues = UnionOmit<Entry, "id">;
 
 export interface Patient {
   id: string;

@@ -133,7 +133,7 @@ const parseSickLeave = (object: object): SickLeave | undefined => {
 const toNewOccupationalHealthcareEntry = (object: object): NewEntry => {
   const baseEntry = toNewBaseEntry(object);
 
-  if ("employerName" in object) {
+  if ("employerName" in object && object.employerName) {
     return {
       ...baseEntry,
       type: "OccupationalHealthcare",

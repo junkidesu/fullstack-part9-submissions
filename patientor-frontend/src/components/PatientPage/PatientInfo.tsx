@@ -79,7 +79,7 @@ const PatientInfo = ({
 
       {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
 
-      <NewEntryForm onSubmit={submitEntry} />
+      <NewEntryForm onSubmit={submitEntry} diagnoses={diagnoses} />
 
       <h3>entries</h3>
 

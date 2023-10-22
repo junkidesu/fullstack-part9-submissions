@@ -5,6 +5,8 @@ import {
   HealthCheckRating,
   Discharge,
   SickLeave,
+  Gender,
+  NewPatient,
 } from "../types";
 
 const isString = (text: unknown): text is string => {
@@ -27,6 +29,42 @@ const parseDate = (date: unknown): string => {
   }
 
   return date;
+};
+
+const isGender = (gender: string): gender is Gender => {
+  return Object.values(Gender)
+    .map((obj) => obj.toString())
+    .includes(gender);
+};
+
+const parseGender = (gender: unknown): Gender => {
+  if (!isString(gender) || !isGender(gender)) {
+    throw new Error("Invalid gender");
+  }
+
+  return gender;
+};
+
+export const toNewPatient = (object: unknown): NewPatient => {
+  if (!object || typeof object !== "object") {
+    throw new Error("Incorrect or missing data");
+  }
+
+  if (!("name" in object)) throw new Error("patient name missing");
+  if (!("dateOfBirth" in object))
+    throw new Error("patient dateOfBirth missing");
+  if (!("ssn" in object)) throw new Error("patient ssn missing");
+  if (!("gender" in object)) throw new Error("patient gender missing");
+  if (!("occupation" in object)) throw new Error("patient occupation missing");
+
+  return {
+    name: parseString(object.name, "name"),
+    dateOfBirth: parseDate(object.dateOfBirth),
+    ssn: parseString(object.ssn, "ssn"),
+    gender: parseGender(object.gender),
+    occupation: parseString(object.occupation, "occupation"),
+    entries: [],
+  };
 };
 
 const parseDiagnosisCodes = (object: unknown): Array<Diagnose["code"]> => {
